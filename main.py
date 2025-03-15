@@ -5,13 +5,14 @@ from sklearn.model_selection import train_test_split  # Dividir dados
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error  # Avaliar o modelo
 
-df = pd.read_csv('C:\\Users\\destr\\Documents\\Enchentes\\segundo\\dados_atualizados.csv')
+df = pd.read_csv('dados_atualizados.csv')
 
 # Remover valores ausentes (se houver)
 df = df.dropna()
+df = df.set_index('Data')
 
 # Selecionar as colunas mais importantes
-colunas_usadas = ['Data', 'Nível', 'Taxa Chuva (mm/h)', 'Chuva Acum. Dia (mm)','Temp (ºC)', 'umidade_2m', 'velocidade_vento']
+colunas_usadas = ['Nível', 'Taxa Chuva (mm/h)', 'Chuva Acum. Dia (mm)','Temp (ºC)', 'umidade_2m', 'velocidade_vento']
 df = df[colunas_usadas]
 
 # Separar "x" (dados de entrada) e "y" (o que queremos prever)
@@ -24,11 +25,10 @@ x = pd.get_dummies(x, drop_first=True)  # Converte texto em números
 #print(x.head)
 #print(x.shape, y.shape)
 
-
 x_treino, x_teste, y_treino, y_teste = train_test_split(x, y, test_size=0.2, random_state=42)
 
 # Criar e treinar o modelo Random Forest
-modelo = RandomForestRegressor(n_estimators=100, random_state=42)
+modelo = RandomForestRegressor(n_estimators=500, random_state=42)
 modelo.fit(x_treino, y_treino)
 
 # Fazer previsões nos dados de teste
@@ -37,9 +37,11 @@ y_previsto = modelo.predict(x_teste)
 # Calcular métricas de erro
 mae = mean_absolute_error(y_teste, y_previsto)
 mse = mean_squared_error(y_teste, y_previsto)
+rmse = np.sqrt(mse)
 
 print(f"Erro Médio Absoluto (MAE): {mae:.2f}")
 print(f"Erro Quadrático Médio (MSE): {mse:.2f}")
+print(f"Raiz do Erro Quadrático Médio (RMSE): {rmse:.2f}")
 
 # Fazer previsão para um novo dia
 novo_dado1 = pd.DataFrame([
